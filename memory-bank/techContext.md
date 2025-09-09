@@ -6,29 +6,52 @@
 
 | Technology | Purpose | Version |
 |------------|---------|---------|
-| Python | Primary programming language | 3.7+ |
+| Python | Primary programming language | 3.11+ |
+| uv | Modern Python package manager | Latest |
 | Click | Command-line interface framework | 8.0+ |
 | Anthropic Claude API | AI for grading and synthesis | Claude 3 Opus |
-| pytest | Testing framework | 7.0+ |
+| OpenAI API | Alternative AI provider | GPT-4 |
+| pytest | Testing framework | 8.0+ |
 | pyperclip | Clipboard integration | 1.8+ |
+| tabulate | Table formatting for CLI output | 0.9+ |
 
 ### Python Libraries
 
 | Library | Purpose |
 |---------|---------|
 | **anthropic** | Client for Claude API |
+| **openai** | Client for OpenAI API and compatible services |
+| **python-dotenv** | Environment variable management |
 | **json** | JSON parsing and serialization |
 | **os / pathlib** | Filesystem operations |
 | **dataclasses** | Structured data objects |
 | **typing** | Type hints for better code quality |
 | **click** | CLI framework |
-| **pytest** | Testing |
+| **pytest** | Testing framework |
 | **unittest.mock** | Mocking for tests |
 | **pyperclip** | System clipboard access |
+| **tabulate** | Table formatting |
+| **hashlib** | Content hashing for duplicate detection |
 
 ## Development Setup
 
-### Environment Setup
+### Modern Environment Setup (uv package manager)
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install project dependencies (creates .venv automatically)
+uv sync
+
+# Activate virtual environment
+source .venv/bin/activate
+
+# Run commands with uv (alternative to activation)
+uv run python discussion-grader/grader.py discussion list
+```
+
+### Legacy Environment Setup (pip)
 
 ```bash
 # Create virtual environment
@@ -41,27 +64,72 @@ python -m venv .venv
 source .venv/bin/activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r discussion-grader/requirements.txt
 ```
 
 ### Required Environment Variables
 
-- `ANTHROPIC_API_KEY`: Required for AI grading functionality
+- **AI Provider Configuration**:
+  - `ANTHROPIC_API_KEY`: For Claude API access
+  - `OPENAI_API_KEY`: For OpenAI API access
+  - `AI_PROVIDER`: Default provider selection (`anthropic` or `openai`)
+  - `OPENAI_BASE_URL`: Custom API endpoints for OpenAI-compatible services
 
 ### Configuration Files
 
-- `config/config.json`: Global configuration settings
+- **Project Configuration**: `pyproject.toml`
+  ```toml
+  [build-system]
+  requires = ["setuptools>=45", "wheel"]
+  build-backend = "setuptools.build_meta"
+  
+  [project]
+  name = "discussion-grader"
+  version = "1.0.0"
+  dependencies = [
+      "anthropic>=0.25.0",
+      "openai>=1.30.0",
+      "python-dotenv>=1.0.0",
+      "click>=8.1.0",
+      "pytest>=8.0.0",
+      "pyperclip>=1.8.0",
+      "tabulate>=0.9.0",
+  ]
+  ```
+
+- **System Configuration**: `discussion-grader/config/config.json`
   ```json
   {
+    "ai": {
+      "provider": "anthropic",
+      "anthropic": {
+        "model": "claude-3-opus-20240229",
+        "temperature": 0,
+        "max_tokens": 4096
+      },
+      "openai": {
+        "model": "gpt-4",
+        "base_url": "https://api.openai.com/v1",
+        "temperature": 0,
+        "max_tokens": 4096
+      }
+    },
     "synthesis": {
       "prompt": "You are synthesizing student responses...",
       "max_submissions": 50
     },
     "grading": {
-      "default_points": 12,
-      "default_min_words": 300
+      "default_points": 8,
+      "default_min_words": 100
     }
   }
+  ```
+
+- **Environment Variables**: `.env` (optional)
+  ```env
+  ANTHROPIC_API_KEY=your-claude-api-key
+  OPENAI_API_KEY=your-openai-api-key
+  AI_PROVIDER=anthropic
   ```
 
 ## Technical Constraints

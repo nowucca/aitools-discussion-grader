@@ -8,7 +8,9 @@ An AI-powered CLI tool for creating discussion questions and grading student sub
 
 - Python 3.11+ 
 - [uv](https://docs.astral.sh/uv/) package manager
-- Anthropic API key
+- API key for either:
+  - **Anthropic Claude** (recommended)
+  - **OpenAI GPT** or OpenAI-compatible service
 
 ### Setup
 
@@ -28,15 +30,72 @@ An AI-powered CLI tool for creating discussion questions and grading student sub
    source .venv/bin/activate
    ```
 
-4. **Set up your Anthropic API key:**
+4. **Set up your AI provider:**
+
+   **Option A: Anthropic Claude (Default)**
    ```bash
-   export ANTHROPIC_API_KEY="your-api-key-here"
+   export ANTHROPIC_API_KEY="your-anthropic-api-key-here"
    ```
    
-   Or add it to your shell profile (`.bashrc`, `.zshrc`, etc.):
+   **Option B: OpenAI GPT**
+   ```bash
+   export OPENAI_API_KEY="your-openai-api-key-here"
+   export AI_PROVIDER="openai"  # Optional: auto-detected if OPENAI_API_KEY is set
+   ```
+   
+   **Option C: OpenAI-Compatible Service (e.g., Local LLM)**
+   ```bash
+   export OPENAI_API_KEY="your-api-key"
+   export OPENAI_BASE_URL="http://localhost:8080/v1"  # Your custom endpoint
+   export AI_PROVIDER="openai"
+   ```
+   
+   Or add to your shell profile (`.bashrc`, `.zshrc`, etc.):
    ```bash
    echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.zshrc
+   # OR
+   echo 'export OPENAI_API_KEY="your-api-key-here"' >> ~/.zshrc
    ```
+
+## AI Provider Configuration
+
+The system supports multiple AI providers with automatic detection:
+
+### Environment Variables
+- `ANTHROPIC_API_KEY` - Your Anthropic API key
+- `OPENAI_API_KEY` - Your OpenAI API key  
+- `AI_PROVIDER` - Force specific provider: "anthropic" or "openai" (optional)
+- `OPENAI_BASE_URL` - Custom OpenAI-compatible endpoint (optional)
+
+### Provider Selection Priority
+1. **Explicit**: If `AI_PROVIDER` is set, uses that provider
+2. **Auto-detect**: If `ANTHROPIC_API_KEY` exists, uses Anthropic
+3. **Auto-detect**: If `OPENAI_API_KEY` exists, uses OpenAI
+4. **Fallback**: Defaults to Anthropic (requires API key)
+
+### Configuration File
+You can also configure providers in `discussion-grader/config/config.json`:
+
+```json
+{
+  "ai": {
+    "provider": "openai",
+    "anthropic": {
+      "model": "claude-3-sonnet-20240229",
+      "max_tokens": 1000,
+      "temperature": 0.3
+    },
+    "openai": {
+      "model": "gpt-4",
+      "max_tokens": 1000,
+      "temperature": 0.3,
+      "base_url": "https://api.openai.com/v1"
+    }
+  }
+}
+```
+
+**Note**: Environment variables take precedence over configuration file settings.
 
 ## Creating Your First Discussion
 
@@ -221,8 +280,24 @@ Discussion-General/
 
 ### API Key Issues
 ```bash
-# Test your API key
-python -c "import os; print('API Key set:', bool(os.environ.get('ANTHROPIC_API_KEY')))"
+# Test your Anthropic API key
+python -c "import os; print('Anthropic API Key set:', bool(os.environ.get('ANTHROPIC_API_KEY')))"
+
+# Test your OpenAI API key
+python -c "import os; print('OpenAI API Key set:', bool(os.environ.get('OPENAI_API_KEY')))"
+
+# Check which provider will be used
+python -c "
+import os
+if os.environ.get('AI_PROVIDER'):
+    print(f'Forced provider: {os.environ.get(\"AI_PROVIDER\")}')
+elif os.environ.get('ANTHROPIC_API_KEY'):
+    print('Will use: Anthropic (auto-detected)')
+elif os.environ.get('OPENAI_API_KEY'):
+    print('Will use: OpenAI (auto-detected)')
+else:
+    print('No API keys found - will default to Anthropic')
+"
 ```
 
 ### Permission Errors
@@ -231,11 +306,23 @@ python -c "import os; print('API Key set:', bool(os.environ.get('ANTHROPIC_API_K
 which python  # Should show .venv path
 ```
 
+### Provider-Specific Issues
+- **Anthropic**: Ensure your API key has sufficient credits and proper permissions
+- **OpenAI**: Check your API key and organization settings
+- **Custom OpenAI-compatible**: Verify your `OPENAI_BASE_URL` is accessible and supports the OpenAI API format
+
 ## Development
 
 ### Running Tests
 ```bash
+# Run tests using uv for proper environment management
 uv run pytest discussion-grader/tests/
+
+# Run specific test files
+uv run pytest discussion-grader/tests/unit/lib/test_ai.py
+
+# Run tests with coverage
+uv run pytest discussion-grader/tests/ --cov=discussion-grader/lib/
 ```
 
 ### Adding Dependencies
@@ -243,4 +330,4 @@ uv run pytest discussion-grader/tests/
 uv add package-name
 ```
 
-The system uses Claude AI for grading and provides detailed feedback to help students improve their discussion contributions while saving instructors significant time.
+The system uses AI for grading (supporting both Anthropic Claude and OpenAI GPT/compatible providers) and provides detailed feedback to help students improve their discussion contributions while saving instructors significant time.

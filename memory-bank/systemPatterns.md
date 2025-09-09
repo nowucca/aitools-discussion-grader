@@ -127,13 +127,20 @@ The controllers act as intermediaries between the CLI and library layers, handli
 The Discussion Manager and Submission Grader implement the repository pattern for storing and retrieving discussions and submissions.
 
 ### 4. Facade Pattern
-Each major library component provides a simplified interface to a more complex subsystem (e.g., AI Grader encapsulates all the complexity of interacting with the Claude API).
+Each major library component provides a simplified interface to a more complex subsystem (e.g., AI Grader encapsulates all the complexity of interacting with multiple AI APIs).
 
-### 5. Strategy Pattern
-Different formatting strategies (table, JSON, CSV) can be selected at runtime.
+### 5. Factory Pattern
+The AI provider system uses the factory pattern to create appropriate AI provider instances based on configuration.
 
-### 6. Domain Model Pattern
+### 6. Strategy Pattern
+- Different formatting strategies (table, JSON, CSV) can be selected at runtime
+- Different AI providers can be selected as grading strategies
+
+### 7. Domain Model Pattern
 We use rich domain models (e.g., Discussion class) that encapsulate both data and behavior, following Domain-Driven Design principles.
+
+### 8. Adapter Pattern
+Canvas SpeedGrader integration adapts Canvas data structures to our internal domain models.
 
 ## Critical Implementation Paths
 

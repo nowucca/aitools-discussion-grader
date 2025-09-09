@@ -1,10 +1,24 @@
 {
+  "ai": {
+    "provider": "openai",
+    "anthropic": {
+      "model": "claude-3-opus-20240229",
+      "temperature": 0,
+      "max_tokens": 4096
+    },
+    "openai": {
+      "model": "openai--gpt-oss-120b",
+      "base_url": "http://aitools.cs.vt.edu:7860/opensource/v1",
+      "temperature": 0,
+      "max_tokens": 4096
+    }
+  },
   "synthesis": {
     "prompt": "You are synthesizing student responses to create a comprehensive instructor response. Extract key insights, identify common themes, and highlight unique perspectives.",
-    "max_submissions": 50
+    "max_submissions": 120
   },
   "grading": {
-    "default_points": 12,
-    "default_min_words": 300
+    "default_points": 8,
+    "default_min_words": 100
   }
 }

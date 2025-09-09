@@ -33,7 +33,14 @@ class SubmissionGrader:
         """
         self.base_dir = Path(base_dir)
         self.discussion_manager = DiscussionManager(base_dir)
-        self.ai_grader = AIGrader(api_key)
+        
+        # Find config file relative to the base directory
+        config_file = None
+        config_path = Path(base_dir).parent / "discussion-grader" / "config" / "config.json"
+        if config_path.exists():
+            config_file = str(config_path)
+        
+        self.ai_grader = AIGrader(api_key, config_file=config_file)
     
     def grade_submission(self, discussion_id: int, file_path: str, 
                         save: bool = True) -> GradedSubmission:
@@ -271,7 +278,7 @@ class SubmissionGrader:
             ])
         
         report_lines.extend([
-            f"GRADE: {graded_submission.score}/{total_points}",
+            f"GRADE: {int(graded_submission.score)}/{total_points}",
             "",
             f"WORD COUNT: {graded_submission.word_count} words"
         ])
