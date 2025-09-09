@@ -1,0 +1,10 @@
+{
+  "synthesis": {
+    "prompt": "You are synthesizing student responses to create a comprehensive instructor response. Extract key insights, identify common themes, and highlight unique perspectives.",
+    "max_submissions": 50
+  },
+  "grading": {
+    "default_points": 12,
+    "default_min_words": 300
+  }
+}

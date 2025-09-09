@@ -1,0 +1,2 @@
+For every test assertion, we should make sure to include an English phrase that is useful to a developer to indicate the true nature of what went wrong.
+Make sure when you write or read tests that this is the case.
