@@ -55,11 +55,12 @@ The Canvas SpeedGrader expects JSON input via stdin with this structure:
 - **discussion.points_possible**: Maximum points for the assignment
 - **discussion.min_words**: Minimum word count requirement
 - **discussion.title**: Optional title (auto-generated from prompt if not provided)
+- **discussion.id**: Optional Canvas discussion ID (system will auto-assign if not provided)
 - **student.name**: Student's name (used for personalized feedback)
 - **submission.message**: The student's submission text
 - **submission.word_count**: Word count (optional - auto-calculated if not provided)
 
-**Note**: You do NOT need to provide internal discussion IDs. The system automatically creates or finds discussions based on content and returns the assigned IDs.
+**Note**: Discussion IDs are optional. If Canvas provides a discussion ID, the system will use it. If not provided, the system automatically creates or finds discussions based on content and assigns an internal ID.
 
 ### Output Format
 The grader outputs JSON results via stdout:
